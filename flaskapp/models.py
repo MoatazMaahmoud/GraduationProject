@@ -17,7 +17,7 @@ class User(db.Model,UserMixin):
     address = db.Column(db.String(120), nullable=False)
     city = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(20), nullable=False)
-    medicaltextrecords = db.relationship('MedicalTextRecords', backref='Patient', lazy=True)
+    #medicaltextrecords = db.relationship('MedicalTextRecords', backref='Patient', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}', '{self.address}','{self.city},'{self.country}'')"
@@ -29,11 +29,10 @@ class MedicalTextRecords(db.Model):
     age=db.Column(db.Integer,nullable=False)
     sex = db.Column(db.String(10), nullable=False)
     cp=db.Column(db.String(10),nullable=False)#-- Value 1: typical angina -- Value 2: atypical angina -- Value 3: non-anginal pain -- Value 4: asymptomatic
-    #cp will be a drop down of the strings mentioned
     trestbps=db.Column(db.Integer,nullable=False)#resting blood pressure
     cholestrol=db.Column(db.Integer,nullable=False)
     fbs=db.Column(db.Integer,nullable=False)#(fasting blood sugar > 120 mg/dl)  (1 = true; 0 = false)
-    restecg=db.Column(db.Integer,nullable=False) #resting electrocardiographic results-- Value 0: normal-- Value 1: having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) -- Value 2: showing probable or definite left ventricular hypertrophy by Estes' criteria
+    #restecg=db.Column(db.Integer,nullable=False) #resting electrocardiographic results-- Value 0: normal-- Value 1: having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) -- Value 2: showing probable or definite left ventricular hypertrophy by Estes' criteria
     thalac=db.Column(db.Integer,nullable=False) #maximum heart rate achieved
     exang=db.Column(db.String(3),nullable=False)#exercise induced angina (1 = yes; 0 = no)
     oldpeak =db.Column(db.Float,nullable=False) #ST depression induced by exercise relative to rest
