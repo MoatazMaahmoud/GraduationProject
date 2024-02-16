@@ -4,28 +4,13 @@ from PIL import Image
 from flask import  render_template, url_for, flash, redirect,request
 from flaskapp import app,db,bcrypt
 from flaskapp.models import User,MedicalTextRecords
-from flaskapp.forms import RegistrationForm, LoginForm,UpdateAccountForm
+from flaskapp.forms import RegistrationForm, LoginForm,UpdateAccountForm,PredictionForm,DetectionForm
 from flask_login import login_user, current_user, logout_user, login_required
-posts = [
-    {
-        'author': 'Corey Schafer',
-        'title': 'Blog Post 1',
-        'content': 'First post content',
-        'date_posted': 'April 20, 2018'
-    },
-    {
-        'author': 'Jane Doe',
-        'title': 'Blog Post 2',
-        'content': 'Second post content',
-        'date_posted': 'April 21, 2018'
-    }
-]
-
 
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html', posts=posts)
+    return render_template('home.html')
 
 
 @app.route("/about")
@@ -116,3 +101,15 @@ def account():
     #path of the current user's image
     image_file=url_for('static',filename='profile_pics/'+current_user.image_file)
     return render_template('account.html', title='My account',image_file=image_file,form=form)
+
+@app.route("/prediction", methods=['GET', 'POST'])
+@login_required
+def prediction():
+    form=PredictionForm()
+    return render_template('prediction.html',form=form)
+
+@app.route("/detection", methods=['GET', 'POST'])
+@login_required
+def detection():
+    form=DetectionForm()
+    return render_template('detection.html',form=form)

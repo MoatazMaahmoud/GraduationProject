@@ -1,0 +1,209 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <br>
+    <!--Form-->
+    <form action = "" method ="POST" >
+      {{ form.hidden_tag() }}
+        <fieldset>
+        <legend>Heart Disease Test Form</legend><br>
+          <div class="card card-body" >
+              <div class="form-group  row">
+                <div class="col-sm-3">
+                  {{ form.age.label(class="form-control-label") }}
+                  {% if form.age.errors %}
+                      {{ form.age(class="form-control form-control-lg is-invalid") }}
+                      <div class="invalid-feedback">
+                          {% for error in form.age.errors %}
+                              <span>{{ error }}</span>
+                          {% endfor %}
+                      </div>
+                  {% else %}
+                      {{ form.age(class="form-control form-control-lg") }}
+                  {% endif %}
+                   
+                </div>
+                <div class="col-sm-3">
+                  {{ form.sex.label(class="form-control-label") }}
+                  {% if form.sex.errors %}
+                      {{ form.sex(class="form-control form-control-lg is-invalid") }}
+                      <div class="invalid-feedback">
+                          {% for error in form.sex.errors %}
+                              <span>{{ error }}</span>
+                          {% endfor %}
+                      </div>
+                  {% else %}
+                      {{ form.sex(class="form-control form-control-lg") }}  
+                  {% endif %}
+               </div>
+              </div>
+              <br>
+              <div class="form-group  row">               
+                  <div class="col-sm">
+                  {{ form.cp.label(class="form-control-label") }}
+                  {% if form.cp.errors %}
+                    {{ form.cp(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.cp.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.cp(class="form-control form-control-lg") }}
+                {% endif %}
+                  </div>
+                  <div class="col-sm">
+                    {{ form.trestbps.label(class="form-control-label") }}
+                  {% if form.trestbps.errors %}
+                    {{ form.trestbps(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.trestbps.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.trestbps(class="form-control form-control-lg") }}
+                {% endif %}
+                  </div>
+                  <div class="col-sm">
+                  {{ form.fbs.label(class="form-control-label") }}
+                  {% if form.fbs.errors %}
+                    {{ form.fbs(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.fbs.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.fbs(class="form-control form-control-lg") }}
+                {% endif %}
+                </div>
+              </div>             
+              <br>
+              <div class="form-group row">
+                <div class="col-sm">
+                  {{ form.cholestrol.label(class="form-control-label") }}
+                  {% if form.cholestrol.errors %}
+                    {{ form.cholestrol(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.cholestrol.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.cholestrol(class="form-control form-control-lg") }}
+                    {% endif %}
+                  </div>
+                    <div class="col-sm">
+                      {{ form.restecg.label(class="form-control-label") }}
+                  {% if form.restecg.errors %}
+                    {{ form.restecg(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.restecg.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.restecg(class="form-control form-control-lg") }}
+                    {% endif %}
+                      </div>
+                      <div class="col-sm">
+                        {{ form.thalach.label(class="form-control-label") }}
+                      {% if form.thalach.errors %}
+                    {{ form.thalach(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.thalach.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                      {% else %}
+                    {{ form.thalach(class="form-control form-control-lg") }}
+                    {% endif %}
+                      </div>
+                      <div class="col-sm">
+                      {{ form.exang.label(class="form-control-label") }}
+                      {% if form.exang.errors %}
+                      {{ form.exang(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.exang.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                      {% else %}
+                        {{ form.exang(class="form-control form-control-lg") }}
+                      {% endif %}
+                      </div>
+                  </div>
+                  <br>
+                  <div class="form-group  row">
+                  <div class="col-sm">
+                    {{ form.slope.label(class="form-control-label") }}
+                      {% if form.slope.errors %}
+                      {{ form.slope(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.slope.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                      {% else %}
+                        {{ form.slope(class="form-control form-control-lg") }}
+                      {% endif %}
+                    
+                  </div>
+                  <div class="col-sm">
+                    {{ form.ca.label(class="form-control-label") }}
+                      {% if form.ca.errors %}
+                      {{ form.ca(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.ca.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                      {% else %}
+                        {{ form.ca(class="form-control form-control-lg") }}
+                      {% endif %}
+                    
+                  </div>
+                  <div class="col-sm">
+                    {{ form.thal.label(class="form-control-label") }}
+                      {% if form.thal.errors %}
+                      {{ form.thal(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.thal.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                      {% else %}
+                        {{ form.thal(class="form-control form-control-lg") }}
+                      {% endif %}
+                  </div>
+                  <div class="col-sm">
+                    {{ form.oldpeak.label(class="form-control-label") }}
+                      {% if form.oldpeak.errors %}
+                      {{ form.oldpeak(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.oldpeak.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                      {% else %}
+                        {{ form.oldpeak(class="form-control form-control-lg") }}
+                      {% endif %}
+                  </div>
+              </div>
+              <br>
+              <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+                <!-- <input class="btn btn-primary" type="submit" value="Result"> -->
+              </div>
+              
+              <!--Prediction Result-->
+              <div id ="result">
+                    <strong style="color:red">{{result}}</strong>
+             </div>
+             </div>
+     </fieldset>
+    </form>
+    
+</div>
+{% endblock content %}
