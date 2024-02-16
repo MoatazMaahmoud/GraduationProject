@@ -1,0 +1,1 @@
+https://ianmcatee.com/converting-a-nifti-file-to-an-image-sequence-using-python/ 
