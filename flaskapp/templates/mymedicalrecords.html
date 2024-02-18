@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+   
+    {%if current_user.is_authenticated:%}
+        <span>{{current_user.medicaltextrecords}}</span>
+    {%else%}
+        <span>NOT LOGGED IN!</span>
+    {% endif %}
+{% endblock content %}

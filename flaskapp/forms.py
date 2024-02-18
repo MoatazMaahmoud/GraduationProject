@@ -66,7 +66,8 @@ class UpdateAccountForm(FlaskForm):
 class PredictionForm(FlaskForm):
     #1-fields needed to be filled here
     age=IntegerField('Age',validators=[DataRequired()])
-    sex = SelectField('Sex',validators=[DataRequired()], choices=[('', '-- Select an Option --'), ('1', 'Male'), ('0', 'Female')], default='')
+    sex = SelectField('Sex',validators=[DataRequired()], choices=[('', '-- Select an Option --'),('1', 'Male'),
+                                                 ('0', 'Female')],default='')
 
     cp= SelectField('Chest Pain Type',validators=[DataRequired()], choices=[('', '-- Select an Option --'),('1', 'Typical Angina'), ('2', 'Atypical Angina'),
                                                 ('3', 'Non-anginal Pain'),('4', 'Asymptomatic')], default='')#-- Value 1: typical angina -- Value 2: atypical angina -- Value 3: non-anginal pain -- Value 4: asymptomatic

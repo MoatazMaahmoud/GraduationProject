@@ -6,7 +6,7 @@ from flaskapp import app,db,bcrypt
 from flaskapp.models import User,MedicalTextRecords
 from flaskapp.forms import RegistrationForm, LoginForm,UpdateAccountForm,PredictionForm,DetectionForm
 from flask_login import login_user, current_user, logout_user, login_required
-
+from flaskapp.attributes import dictionary
 @app.route("/")
 @app.route("/home")
 def home():
@@ -55,8 +55,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
-
-
 #save pic function takes the form.picture.data then
 #changes its name to a random hex and adds its original extension
 #saves the pic in a path of the app
@@ -75,8 +73,6 @@ def save_picture(form_picture):
     i.save(picture_path)
 
     return picture_fn
-
-
 
 
 @app.route("/account", methods=['GET', 'POST'])
@@ -102,10 +98,54 @@ def account():
     image_file=url_for('static',filename='profile_pics/'+current_user.image_file)
     return render_template('account.html', title='My account',image_file=image_file,form=form)
 
+
 @app.route("/prediction", methods=['GET', 'POST'])
 @login_required
 def prediction():
     form=PredictionForm()
+    if form.validate_on_submit():
+        # Get the label for 'sex' based on the selected value from the form
+        sex_label = dictionary['sex']['choices'].get(form.sex.data)
+
+        # Get the label for 'cp' based on the selected value from the form
+        cp_label = dictionary['cp']['choices'].get(form.cp.data)
+
+        # Get the label for 'fbs' based on the selected value from the form
+        fbs_label = dictionary['fbs']['choices'].get(form.fbs.data)
+
+        # Get the label for 'restecg' based on the selected value from the form
+        restecg_label = dictionary['restecg']['choices'].get(form.restecg.data)
+
+        # Get the label for 'exang' based on the selected value from the form
+        exang_label = dictionary['exang']['choices'].get(form.exang.data)
+
+        # Get the label for 'slope' based on the selected value from the form
+        slope_label = dictionary['slope']['choices'].get(form.slope.data)
+
+        # Get the label for 'thal' based on the selected value from the form
+        thal_label = dictionary['thal']['choices'].get(form.thal.data)
+
+        # Assuming other values are directly mapped without conversion
+        medicalrecord = MedicalTextRecords(
+            age=form.age.data,
+            sex=sex_label,  # Use the label instead of the value from the form
+            cp=cp_label,
+            trestbps=form.trestbps.data,
+            cholestrol=form.cholestrol.data,
+            fbs=fbs_label,
+            restecg=restecg_label,
+            thalach=form.thalach.data,
+            exang=exang_label,
+            oldpeak=form.oldpeak.data,
+            slope=slope_label,
+            ca=form.ca.data,
+            thal=thal_label,
+            patient=current_user
+        )
+        db.session.add(medicalrecord)
+        db.session.commit()
+        flash('Your medical record is added', 'success')       
+        return redirect(url_for('result'))
     return render_template('prediction.html',form=form)
 
 @app.route("/detection", methods=['GET', 'POST'])
@@ -113,3 +153,14 @@ def prediction():
 def detection():
     form=DetectionForm()
     return render_template('detection.html',form=form)
+
+@app.route("/result", methods=['GET', 'POST'])
+@login_required
+def result():
+    return render_template('result.html')
+
+
+@app.route("/mymedicalrecords", methods=['GET', 'POST'])
+@login_required
+def mymedicalrecords():
+    return render_template('mymedicalrecords.html')
