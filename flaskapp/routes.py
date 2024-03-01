@@ -163,4 +163,6 @@ def result():
 @app.route("/mymedicalrecords", methods=['GET', 'POST'])
 @login_required
 def mymedicalrecords():
-    return render_template('mymedicalrecords.html')
+    user_medical_records = current_user.medicaltextrecords
+    
+    return render_template('mymedicalrecords.html',user_medical_records=user_medical_records)
