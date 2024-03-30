@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Prediction Result</h1>
+    <p>The predicted result is: </p>
+        {% if prediction==0%}
+        <p>Healthy,Not Candidate to heart disease</p>
+        {%else%}
+        <p>Candidate to heart disease</p>
+        {%endif%}
+    
+{% endblock %}

@@ -107,19 +107,7 @@
                     {{ form.restecg(class="form-control form-control-lg") }}
                     {% endif %}
                       </div>
-                      <div class="col-sm">
-                        {{ form.thalach.label(class="form-control-label") }}
-                      {% if form.thalach.errors %}
-                    {{ form.thalach(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.thalach.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                      {% else %}
-                    {{ form.thalach(class="form-control form-control-lg") }}
-                    {% endif %}
-                      </div>
+                      
                       <div class="col-sm">
                       {{ form.exang.label(class="form-control-label") }}
                       {% if form.exang.errors %}
@@ -150,20 +138,7 @@
                       {% endif %}
                     
                   </div>
-                  <div class="col-sm">
-                    {{ form.ca.label(class="form-control-label") }}
-                      {% if form.ca.errors %}
-                      {{ form.ca(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.ca.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                      {% else %}
-                        {{ form.ca(class="form-control form-control-lg") }}
-                      {% endif %}
-                    
-                  </div>
+                  
                   <div class="col-sm">
                     {{ form.thal.label(class="form-control-label") }}
                       {% if form.thal.errors %}

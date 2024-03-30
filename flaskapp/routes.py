@@ -1,5 +1,7 @@
 import os
 import secrets
+import pickle
+from flask import jsonify
 from PIL import Image
 from flask import  render_template, url_for, flash, redirect,request
 from flaskapp import app,db,bcrypt
@@ -7,6 +9,9 @@ from flaskapp.models import User,MedicalTextRecords
 from flaskapp.forms import RegistrationForm, LoginForm,UpdateAccountForm,PredictionForm,DetectionForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskapp.attributes import dictionary
+
+model=pickle.load(open('./flaskapp/model.pkl','rb'))
+
 @app.route("/")
 @app.route("/home")
 def home():
@@ -124,7 +129,20 @@ def prediction():
 
         # Get the label for 'thal' based on the selected value from the form
         thal_label = dictionary['thal']['choices'].get(form.thal.data)
-
+        age = form.age.data
+        sex = form.sex.data
+        cp = form.cp.data
+        trestbps = form.trestbps.data
+        cholestrol = form.cholestrol.data
+        fbs = form.fbs.data
+        restecg = form.restecg.data
+        exang = form.exang.data
+        oldpeak = form.oldpeak.data
+        slope = form.slope.data
+        thal = form.thal.data
+         # Make prediction
+        prediction = model.predict([[age, sex, cp, trestbps, cholestrol, fbs, restecg, exang, oldpeak, slope, thal]]) 
+        result = int(prediction[0])   
         # Assuming other values are directly mapped without conversion
         medicalrecord = MedicalTextRecords(
             age=form.age.data,
@@ -134,19 +152,53 @@ def prediction():
             cholestrol=form.cholestrol.data,
             fbs=fbs_label,
             restecg=restecg_label,
-            thalach=form.thalach.data,
+            # thalach=form.thalach.data,
             exang=exang_label,
             oldpeak=form.oldpeak.data,
             slope=slope_label,
-            ca=form.ca.data,
+            # ca=form.ca.data,
             thal=thal_label,
+            result=result,
             patient=current_user
         )
         db.session.add(medicalrecord)
         db.session.commit()
-        flash('Your medical record is added', 'success')       
-        return redirect(url_for('result'))
+        # Redirect to the prediction result page
+        return redirect(url_for('prediction_result', prediction=result))
     return render_template('prediction.html',form=form)
+
+
+
+@app.route("/prediction/result/<int:prediction>", methods=['GET'])
+@login_required
+def prediction_result(prediction):
+    # Retrieve the prediction result from the URL parameter
+    return render_template('prediction_result.html', prediction=prediction)
+
+# @app.route("/predict", methods=['GET', 'POST'])
+# @login_required
+# def predict():
+#     if request.method == 'POST':
+#         # Extracting form data
+#         age = request.form.get('age', type=int)
+#         sex = request.form.get('sex', type=int)
+#         cp = request.form.get('cp', type=int)
+#         trestbps = request.form.get('trestbps', type=int)
+#         cholestrol = request.form.get('cholestrol', type=int)
+#         fbs = request.form.get('fbs', type=int)
+#         restecg = request.form.get('restecg', type=int)
+#         # thalach = request.form.get('thalach', type=int)
+#         exang = request.form.get('exang', type=int)
+#         oldpeak = request.form.get('oldpeak', type=float)
+#         slope = request.form.get('slope', type=int)
+#         # ca = request.form.get('ca', type=int)
+#         thal = request.form.get('thal', type=int)
+        
+#         # Make prediction
+#         prediction = model.predict([[age, sex, cp, trestbps, cholestrol, fbs, restecg, exang, oldpeak, slope,thal]])
+        
+#         # Respond with prediction result
+#         return jsonify({"prediction": prediction.tolist()})  # Convert to list for JSON serialization
 
 @app.route("/detection", methods=['GET', 'POST'])
 @login_required
