@@ -1,7 +1,7 @@
 from datetime import datetime
-from flaskapp import db,login_manager
+from flaskapp import db,login_manager,app
 from flask_login import UserMixin
-
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -18,6 +18,23 @@ class User(db.Model,UserMixin):
     address = db.Column(db.String(120), nullable=False)
     city = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(20), nullable=False)
+#     we're simply setting this up with our
+# secret key and an expiration time and which by default is 30 minutes and then
+# we're returning that token which is created by the dump s method and it also contains a payload of the current user id
+# so now let's put a method in place that verifies a token 
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            #load the token
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
     #this medicaltextrecords is used to access all medical text records of a user example:
     #user_1.medicaltextrecords ->would return all the records for this user_1
