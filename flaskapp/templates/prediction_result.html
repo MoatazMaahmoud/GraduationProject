@@ -1,12 +1,18 @@
 {% extends "layout.html" %}
-
 {% block content %}
-    <h1>Prediction Result</h1>
-    <p>The predicted result is: </p>
-        {% if prediction==0%}
-        <p>Healthy,Not Candidate to heart disease</p>
-        {%else%}
-        <p>Candidate to heart disease</p>
-        {%endif%}
-    
-{% endblock %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1>Prediction Result</h1>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text">The predicted result is:</p>
+                {% if prediction == 0 %}
+                    <p class="text-success"><strong>Healthy, Not Candidate to heart disease</strong></p>
+                {% else %}
+                    <p class="text-danger"><strong>Candidate to heart disease</strong></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
