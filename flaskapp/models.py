@@ -57,11 +57,11 @@ class MedicalTextRecords(db.Model):
     cholestrol=db.Column(db.Integer,nullable=False)
     fbs=db.Column(db.String(20),nullable=False)#(fasting blood sugar > 120 mg/dl)  (1 = true; 0 = false)
     restecg=db.Column(db.String(100),nullable=False) #resting electrocardiographic results-- Value 0: normal-- Value 1: having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV) -- Value 2: showing probable or definite left ventricular hypertrophy by Estes' criteria
-    # thalach=db.Column(db.Integer,nullable=False) #maximum heart rate achieved
+    thalach=db.Column(db.Integer,nullable=False) #maximum heart rate achieved
     exang=db.Column(db.String(3),nullable=False)#exercise induced angina (1 = yes; 0 = no)
     oldpeak =db.Column(db.Float,nullable=False) #ST depression induced by exercise relative to rest
     slope=db.Column(db.String(20),nullable=False) #the slope of the peak exercise ST segment -- Value 1: upsloping -- Value 2: flat -- Value 3: downsloping
-    # ca=db.Column(db.Integer,nullable=False) #number of major vessels (0-3) colored by flourosopy
+    ca=db.Column(db.Integer,nullable=False) #number of major vessels (0-3) colored by flourosopy
     thal=db.Column(db.String(20),nullable=False) #3 = normal; 6 = fixed defect; 7 = reversable defect
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     result=db.Column(db.Integer)

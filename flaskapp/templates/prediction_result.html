@@ -1,18 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-header text-center">
-                <h1>Prediction Result</h1>
-            </div>
-            <div class="card-body text-center">
-                <p class="card-text">The predicted result is:</p>
-                {% if prediction == 0 %}
-                    <p class="text-success"><strong>Healthy, Not Candidate to heart disease</strong></p>
-                {% else %}
-                    <p class="text-danger"><strong>Candidate to heart disease</strong></p>
-                {% endif %}
-            </div>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header text-center">
+            <h1>Prediction Result</h1>
+        </div>
+        <div class="card-body text-center">
+            <p class="card-text">The predicted result is:</p>
+            {% if prediction == 0 %}
+                <p class="text-success"><strong>Healthy, Not Candidate to heart disease</strong></p>
+            {% elif prediction == 1 %}
+                <p class="text-warning"><strong>Mild Heart Disease</strong></p>
+            {% elif prediction == 2 %}
+                <p class="text-warning"><strong>Moderate Heart Disease</strong></p>
+            {% elif prediction == 3 %}
+                <p class="text-danger"><strong>Severe Heart Disease</strong></p>
+            {% elif prediction == 4 %}
+                <p class="text-danger"><strong>Very Severe Heart Disease</strong></p>
+            {% else %}
+                <p class="text-muted"><strong>Unknown</strong></p>
+            {% endif %}
         </div>
     </div>
+</div>
 {% endblock content %}
+

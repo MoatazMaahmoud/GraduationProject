@@ -10,8 +10,8 @@ from flaskapp.forms import RegistrationForm, LoginForm,UpdateAccountForm,Predict
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskapp.attributes import dictionary
 from flask_mail import Message
-
-model=pickle.load(open('./flaskapp/model.pkl','rb'))
+import numpy as np
+model=pickle.load(open('./flaskapp/multiclass_model.pkl','rb'))
 
 @app.route("/")
 @app.route("/home")
@@ -137,12 +137,18 @@ def prediction():
         cholestrol = form.cholestrol.data
         fbs = form.fbs.data
         restecg = form.restecg.data
+        thalach=form.thalach.data
         exang = form.exang.data
         oldpeak = form.oldpeak.data
         slope = form.slope.data
+        ca=form.ca.data
         thal = form.thal.data
-         # Make prediction
-        prediction = model.predict([[age, sex, cp, trestbps, cholestrol, fbs, restecg, exang, oldpeak, slope, thal]]) 
+       # Example: Ensure input shape and type
+        input_data = [[age, sex, cp, trestbps, cholestrol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]]
+        input_data = np.array(input_data, dtype=np.float32)  # Convert to numpy array with float32 type
+
+        # Perform the prediction
+        prediction = model.predict(input_data)
         result = int(prediction[0])   
         # Assuming other values are directly mapped without conversion
         medicalrecord = MedicalTextRecords(
@@ -153,11 +159,11 @@ def prediction():
             cholestrol=form.cholestrol.data,
             fbs=fbs_label,
             restecg=restecg_label,
-            # thalach=form.thalach.data,
+            thalach=form.thalach.data,
             exang=exang_label,
             oldpeak=form.oldpeak.data,
             slope=slope_label,
-            # ca=form.ca.data,
+            ca=form.ca.data,
             thal=thal_label,
             result=result,
             patient=current_user
