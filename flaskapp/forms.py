@@ -63,6 +63,11 @@ class UpdateAccountForm(FlaskForm):
             email=User.query.filter_by(email=email.data).first()
             if email:
                 raise ValidationError('That email is already taken. Please choose another one.')
+
+class DetectionForm(FlaskForm):
+    signal=FileField('Upload your signal file please',validators=[DataRequired(),FileAllowed(['dat'])])
+    submit=SubmitField('Detect')
+
 class PredictionForm(FlaskForm):
     #1-fields needed to be filled here
     age=IntegerField('Age',validators=[DataRequired()])
@@ -91,7 +96,7 @@ class PredictionForm(FlaskForm):
     submit=SubmitField('Predict')
     
 class DetectionForm(FlaskForm):
-    picture=FileField('Update profile picture',validators=[FileAllowed(['jpg','png','jpeg'])])
+    signal=FileField('Update profile picture',validators=[DataRequired(),FileAllowed(['dat'])])
     submit=SubmitField('Detect')
 
 class RequestResetForm(FlaskForm):

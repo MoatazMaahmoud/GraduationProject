@@ -5,13 +5,13 @@ from flask import jsonify
 from PIL import Image
 from flask import  render_template, url_for, flash, redirect,request
 from flaskapp import app,db,bcrypt,mail
-from flaskapp.models import User,MedicalTextRecords
+from flaskapp.models import User,MedicalTextRecords,MedicalSignalRecords
 from flaskapp.forms import RegistrationForm, LoginForm,UpdateAccountForm,PredictionForm,DetectionForm,RequestResetForm,ResetPasswordForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskapp.attributes import dictionary
 from flask_mail import Message
 import numpy as np
-model=pickle.load(open('./flaskapp/multiclass_model.pkl','rb'))
+prediction_model=pickle.load(open('./flaskapp/multiclass_model.pkl','rb'))
 
 @app.route("/")
 @app.route("/home")
@@ -80,7 +80,21 @@ def save_picture(form_picture):
 
     return picture_fn
 
-
+def load_signal_data(file_path):
+    """
+    Load and preprocess the .dat file for the detection model.
+    """
+    try:
+        # Open the file in binary mode
+        with open(file_path, 'rb') as file:
+            # Example: Read the entire file into a NumPy array
+            signal_data = np.fromfile(file, dtype=np.float32)  # Adjust dtype according to your data format
+            # Example: Reshape the data if necessary (assuming 1D input)
+            signal_data = signal_data.reshape(1, -1)  # Adjust the shape based on your model's input requirements
+        return signal_data
+    except Exception as e:
+        print(f"Error reading the .dat file: {e}")
+        return None
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -104,6 +118,47 @@ def account():
     image_file=url_for('static',filename='profile_pics/'+current_user.image_file)
     return render_template('account.html', title='My account',image_file=image_file,form=form)
 
+@app.route("/detection", methods=['GET', 'POST'])
+@login_required
+def detection():
+    form = DetectionForm()
+    if form.validate_on_submit():
+        if form.signal.data:
+            # Generate a random hex to be used as the new filename
+            random_hex = secrets.token_hex(8)
+            _, f_ext = os.path.splitext(form.signal.data.filename)
+            signal_fn = random_hex + f_ext
+
+            # Ensure the filename is secure and save the file
+            signal_path = os.path.join(app.root_path, 'static/signal_files', signal_fn)
+            form.signal.data.save(signal_path)
+
+            # Load the .dat file and process it for prediction
+            signal_data = load_signal_data(signal_path)
+            if signal_data is None:
+                flash('Error processing the uploaded file.', 'danger')
+                return redirect(url_for('detection'))
+
+            # Make prediction using the detection model
+            # detection = detection_model.predict(signal_data)
+            # result = int(detection[0])
+            result=44
+            # Save the filename and result in the database
+            record = MedicalSignalRecords(signal_file=signal_fn, result=result, user_id=current_user.id)
+            db.session.add(record)
+            db.session.commit()
+
+            flash('Your file has been uploaded and processed!', 'success')
+            return redirect(url_for('detection_result'))
+
+    return render_template('detection.html', title='Detection', form=form)
+
+@app.route("/detection_result", methods=['GET','POST'])
+@login_required
+def detection_result():
+    # Retrieve the prediction result from the URL parameter
+    return render_template('detection_result.html')
+                           #, detection=detection)
 
 @app.route("/prediction", methods=['GET', 'POST'])
 @login_required
@@ -148,7 +203,7 @@ def prediction():
         input_data = np.array(input_data, dtype=np.float32)  # Convert to numpy array with float32 type
 
         # Perform the prediction
-        prediction = model.predict(input_data)
+        prediction = prediction_model.predict(input_data)
         result = int(prediction[0])   
         # Assuming other values are directly mapped without conversion
         medicalrecord = MedicalTextRecords(
@@ -173,8 +228,6 @@ def prediction():
         # Redirect to the prediction result page
         return redirect(url_for('prediction_result', prediction=result))
     return render_template('prediction.html',form=form)
-
-
 
 @app.route("/prediction/result/<int:prediction>", methods=['GET'])
 @login_required
@@ -207,11 +260,7 @@ def prediction_result(prediction):
 #         # Respond with prediction result
 #         return jsonify({"prediction": prediction.tolist()})  # Convert to list for JSON serialization
 
-@app.route("/detection", methods=['GET', 'POST'])
-@login_required
-def detection():
-    form=DetectionForm()
-    return render_template('detection.html',form=form)
+
 
 @app.route("/result", methods=['GET', 'POST'])
 @login_required

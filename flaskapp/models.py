@@ -41,7 +41,7 @@ class User(db.Model,UserMixin):
     #patient is used to know which patient has this medical record example:
     #record.patient ->would return the patient that has this record
     medicaltextrecords = db.relationship('MedicalTextRecords', backref='patient', lazy=True)
-
+    medicalsignalrecords = db.relationship('MedicalSignalRecords', backref='patient', lazy=True)
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}', '{self.address}','{self.city},'{self.country}'')"
 
@@ -70,3 +70,9 @@ class MedicalTextRecords(db.Model):
     def __repr__(self):
         return f"MedicalTextRecords('{self.age}','{self.sex}','{self.cp}','{self.trestbps}','{self.cholestrol}','{self.fbs}','{self.restecg}','{self.thalach}','{self.exang}','{self.oldpeak}','{self.slope}','{self.ca}','{self.thal}')"
     
+class MedicalSignalRecords(db.Model):
+    __tablename__='MedicalSignalRecords'
+    id = db.Column(db.Integer, primary_key=True)
+    signal_file = db.Column(db.String(20), nullable=False)
+    result=db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'),nullable=False)
