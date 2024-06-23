@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <h1 class="account-heading">About CardioCare</h1>
+        <p>Welcome to CardioCare, a cutting-edge platform dedicated to improving cardiovascular health.</p>
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='heart-health.jpg') }}" class="img-fluid rounded mb-4" alt="Cardiovascular Health">
+            </div>
+            <div class="col-md-6">
+                <p>CardioCare leverages advanced technologies to predict cardiovascular disease risks based on comprehensive health data.</p>
+                <p>Our mission is to empower individuals with personalized insights into their heart health, enabling informed decisions and proactive health management.</p>
+                <p>Whether you're monitoring risk factors or seeking preventive strategies, CardioCare is your trusted companion on the journey to a healthier heart.</p>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <p>Explore our predictive tools designed to analyze vital health indicators and provide actionable recommendations tailored to your unique profile.</p>
+                <p>Join CardioCare today and take control of your cardiovascular well-being. Your heart deserves the best care.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='machine-learning.jpg') }}" class="img-fluid rounded mb-4" alt="Machine Learning">
+            </div>
+        </div>
+    </div>
+{% endblock %}
