@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -8,96 +8,91 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-7eKt6e5h5uHjxoMJYf2dWvMNO7+5WIp12ptXw2XHSOVOQuUKUcZ0V5I8hQmXtwq5R9njmsdgF7kWxswIXYt05g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 
     {% if title %}
         <title>Cardio Care - {{ title }}</title>
     {% else %}
         <title>Cardio Care</title>
     {% endif %}
-    <style>
-        body {
-            background-color: white;
-            color: #007b8f; /* Cyan text */
-        }
-        .navbar {
-            background-color: #007b8f; /* Cyan background */
-        }
-        .navbar-brand, .nav-link {
-            color: white !important;
-        }
-        .alert {
-            color: white;
-            background-color: #007b8f; /* Cyan background for alerts */
-        }
-        .carousel {
-            margin: 50px auto;
-        }
-        .carousel-inner {
-            width: 100%;
-            max-height: 600px; /* Adjust the max-height as needed */
-        }
-        footer {
-            background-color: #007b8f; /* Cyan background */
-            color: white;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
-    <header class="site-header">
-      <nav class="navbar navbar-expand-md navbar-dark fixed-top">
-        <div class="container">
-          <a class="navbar-brand mr-4" href="{{ url_for('home') }}">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 30px; width: 30px; margin-right: 10px;">
-            Cardio Care
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarToggle">
-            <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
-              <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+    <header>
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-info">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="mr-2" style="height: 30px;">
+                    Cardio Care
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('account') }}">My Account</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('mymedicalrecords') }}">Medical Records</a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-            <!-- Navbar Right Side -->
-            <div class="navbar-nav">
-              {% if current_user.is_authenticated %}
-              <a class="nav-item nav-link" href="{{ url_for('account') }}">My Account</a>
-              <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-              <a class="nav-item nav-link" href="{{ url_for('mymedicalrecords') }}">My Medical Records</a>
-              {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-                <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </nav>
+        </nav>
     </header>
-    <main role="main" class="container mt-5 pt-5">
+
+    <!-- Main content -->
+    <main role="main" class="container mt-5 pt-3">
         <div class="row justify-content-center">
             <div class="col-md-10">
+                <!-- Flash messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                                 {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <!-- Block named content will be added by the child that has the different thing to show -->
+
+                <!-- Content block -->
                 {% block content %}{% endblock %}
             </div>
         </div>
     </main>
-    <footer>
-        &copy; 2024 Cardio Care. All Rights Reserved.
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-info text-white">
+        <div class="container text-center">
+            &copy; 2024 Cardio Care. All rights reserved.
+        </div>
     </footer>
 
     <!-- Optional JavaScript -->
