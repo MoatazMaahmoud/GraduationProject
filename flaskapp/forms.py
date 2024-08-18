@@ -96,7 +96,7 @@ class PredictionForm(FlaskForm):
     submit=SubmitField('Predict')
     
 class DetectionForm(FlaskForm):
-    signal=FileField('Update profile picture',validators=[DataRequired(),FileAllowed(['dat'])])
+    signal=FileField('Upload your dat file here!',validators=[DataRequired(),FileAllowed(['dat'])])
     submit=SubmitField('Detect')
 
 class RequestResetForm(FlaskForm):

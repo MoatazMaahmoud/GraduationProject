@@ -1,4 +1,30 @@
 {% extends "layout.html" %}
+
 {% block content %}
-    <h1>detection result Page</h1>
-{% endblock content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2>Detection Result</h2>
+                </div>
+                <div class="card-body">
+                    {% if result %}
+                        <div class="alert alert-info text-center">
+                            <h4>The result of the detection is:</h4>
+                            <p class="h3">{{ result }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning text-center">
+                            <h4>No result available.</h4>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('home') }}" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

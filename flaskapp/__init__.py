@@ -1,13 +1,17 @@
 import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_wtf import CSRFProtect
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5798628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123@localhost/cardio_care'
+csrf=CSRFProtect(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 bcrypt=Bcrypt(app)

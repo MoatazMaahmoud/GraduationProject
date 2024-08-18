@@ -64,7 +64,7 @@ class MedicalTextRecords(db.Model):
     ca=db.Column(db.Integer,nullable=False) #number of major vessels (0-3) colored by flourosopy
     thal=db.Column(db.String(20),nullable=False) #3 = normal; 6 = fixed defect; 7 = reversable defect
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    result=db.Column(db.Integer)
+    prediction_result=db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'),nullable=False)
 
     def __repr__(self):
@@ -76,3 +76,5 @@ class MedicalSignalRecords(db.Model):
     signal_file = db.Column(db.String(20), nullable=False)
     result=db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'),nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    

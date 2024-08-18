@@ -1,6 +1,13 @@
+import tensorflow as tf
+from tensorflow import keras
+from keras.models import load_model
+from keras.models import Model
+from keras import backend as K
+import wfdb
 import os
 import secrets
 import pickle
+import numpy as np
 from flask import jsonify
 from PIL import Image
 from flask import  render_template, url_for, flash, redirect,request
@@ -13,6 +20,21 @@ from flask_mail import Message
 import numpy as np
 prediction_model=pickle.load(open('./flaskapp/multiclass_model.pkl','rb'))
 
+# Define any custom objects or layers here
+custom_objects = {
+    'K': K
+}
+detection_model = load_model("./MLII-balancedNotWeighted16batch25ep-lowtrainparam.hdf5", custom_objects=custom_objects)
+class_labels = {
+    'N': 'Normal beat',
+    'V': 'Premature ventricular contraction',
+    '/': 'Paced beat',
+    'A': 'Atrial premature contraction',
+    'F': 'Fusion of ventricular and normal beat',
+    '~': 'Signal quality change'
+}
+
+
 @app.route("/")
 @app.route("/home")
 def home():
@@ -20,7 +42,7 @@ def home():
 
 
 @app.route("/about")
-@login_required
+
 def about():
     return render_template('about.html', title='About')
 
@@ -80,21 +102,29 @@ def save_picture(form_picture):
 
     return picture_fn
 
-def load_signal_data(file_path):
-    """
-    Load and preprocess the .dat file for the detection model.
-    """
-    try:
-        # Open the file in binary mode
-        with open(file_path, 'rb') as file:
-            # Example: Read the entire file into a NumPy array
-            signal_data = np.fromfile(file, dtype=np.float32)  # Adjust dtype according to your data format
-            # Example: Reshape the data if necessary (assuming 1D input)
-            signal_data = signal_data.reshape(1, -1)  # Adjust the shape based on your model's input requirements
-        return signal_data
-    except Exception as e:
-        print(f"Error reading the .dat file: {e}")
-        return None
+
+
+def load_and_preprocess_dat(record_name, sample_length=256):
+    # Read the .hea and .dat files using wfdb
+    record = wfdb.rdsamp(record_name)
+    data = record[0]
+
+    print(f"Original data shape: {data.shape}")
+
+    # Ensure the data is in the required shape (sample_length, 1)
+    if data.shape[0] > sample_length:
+        data = data[:sample_length, 0]  # Assuming single channel ECG data
+    elif data.shape[0] < sample_length:
+        data = np.pad(data[:, 0], (0, sample_length - data.shape[0]), 'constant')  # Assuming single channel ECG data
+
+    data = np.expand_dims(data, axis=0)  # Add batch dimension
+    data = np.expand_dims(data, axis=2)  # Add channel dimension
+
+    print(f"Preprocessed data shape: {data.shape}")
+
+    return data
+
+
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -118,10 +148,31 @@ def account():
     image_file=url_for('static',filename='profile_pics/'+current_user.image_file)
     return render_template('account.html', title='My account',image_file=image_file,form=form)
 
+def load_and_preprocess_dat(record_name, sample_length=256):
+    # Read the .hea and .dat files using wfdb
+    record = wfdb.rdsamp(record_name)
+    data = record[0]
+
+    print(f"Original data shape: {data.shape}")
+
+    # Ensure the data is in the required shape (sample_length, 1)
+    if data.shape[0] > sample_length:
+        data = data[:sample_length, 0]  # Assuming single channel ECG data
+    elif data.shape[0] < sample_length:
+        data = np.pad(data[:, 0], (0, sample_length - data.shape[0]), 'constant')  # Assuming single channel ECG data
+
+    data = np.expand_dims(data, axis=0)  # Add batch dimension
+    data = np.expand_dims(data, axis=2)  # Add channel dimension
+
+    print(f"Preprocessed data shape: {data.shape}")
+
+    return data
+
 @app.route("/detection", methods=['GET', 'POST'])
 @login_required
 def detection():
     form = DetectionForm()
+    
     if form.validate_on_submit():
         if form.signal.data:
             # Generate a random hex to be used as the new filename
@@ -133,32 +184,49 @@ def detection():
             signal_path = os.path.join(app.root_path, 'static/signal_files', signal_fn)
             form.signal.data.save(signal_path)
 
+            # Use the specified directory
+            mit_bih_directory = r'C:/Users/ALEX STORE/Desktop/MIT-BIH'
+            signal_base = os.path.join(mit_bih_directory, os.path.splitext(form.signal.data.filename)[0])
+
             # Load the .dat file and process it for prediction
-            signal_data = load_signal_data(signal_path)
-            if signal_data is None:
-                flash('Error processing the uploaded file.', 'danger')
+            try:
+                signal_data = load_and_preprocess_dat(signal_base)
+            except Exception as e:
+                flash(f'Error processing the uploaded file: {e}', 'danger')
                 return redirect(url_for('detection'))
 
             # Make prediction using the detection model
-            # detection = detection_model.predict(signal_data)
-            # result = int(detection[0])
-            result=44
+            result = detection_model.predict(signal_data)
+            # Extract the prediction result (take the class with highest probability)
+            result_class_index = np.argmax(result, axis=-1)
+            predicted_class_symbol = list(class_labels.keys())[result_class_index[0][0]]
+            predicted_class_string = class_labels[predicted_class_symbol]
+
             # Save the filename and result in the database
-            record = MedicalSignalRecords(signal_file=signal_fn, result=result, user_id=current_user.id)
+            record = MedicalSignalRecords(signal_file=signal_fn, result=predicted_class_string, user_id=current_user.id)
             db.session.add(record)
             db.session.commit()
 
             flash('Your file has been uploaded and processed!', 'success')
-            return redirect(url_for('detection_result'))
+            # Pass the result to the detection_result page via URL parameter
+            return redirect(url_for('detection_result', result=predicted_class_string))
 
     return render_template('detection.html', title='Detection', form=form)
 
-@app.route("/detection_result", methods=['GET','POST'])
+
+@app.route("/detection_result", methods=['GET'])
 @login_required
 def detection_result():
     # Retrieve the prediction result from the URL parameter
-    return render_template('detection_result.html')
-                           #, detection=detection)
+    result = request.args.get('result', None)
+    if result is None:
+        flash('No result found.', 'danger')
+        return redirect(url_for('detection'))
+
+    return render_template('detection_result.html', result=result)
+
+
+                           
 
 @app.route("/prediction", methods=['GET', 'POST'])
 @login_required
@@ -204,7 +272,20 @@ def prediction():
 
         # Perform the prediction
         prediction = prediction_model.predict(input_data)
-        result = int(prediction[0])   
+        result = int(prediction[0]) 
+        string_result="none"  
+        if result == 0:
+            string_result = "Healthy, Not Candidate to heart disease"
+        elif result == 1:
+            string_result = "Mild Heart Disease"
+        elif result == 2:
+            string_result = "Moderate Heart Disease"
+        elif result == 3:
+            string_result = "Severe Heart Disease"
+        elif result == 4:
+            string_result = "Very Severe Heart Disease"
+        else:
+            string_result = "Unknown result"  # In case result is outside the expected range
         # Assuming other values are directly mapped without conversion
         medicalrecord = MedicalTextRecords(
             age=form.age.data,
@@ -220,7 +301,7 @@ def prediction():
             slope=slope_label,
             ca=form.ca.data,
             thal=thal_label,
-            result=result,
+            prediction_result=string_result,
             patient=current_user
         )
         db.session.add(medicalrecord)
@@ -274,6 +355,18 @@ def mymedicalrecords():
     user_medical_records = current_user.medicaltextrecords
     
     return render_template('mymedicalrecords.html',user_medical_records=user_medical_records)
+
+
+@app.route("/mysignalrecords")
+@login_required  # Ensures that only logged-in users can access this page
+def mysignalrecords():
+    # Query to get all signal records for the current user
+    records = MedicalSignalRecords.query.with_entities(
+        MedicalSignalRecords.date_posted, MedicalSignalRecords.result
+    ).filter_by(user_id=current_user.id).all()
+    
+    return render_template('mysignalrecords.html', records=records)
+
 
 def send_reset_email(user):
     token = user.get_reset_token()
